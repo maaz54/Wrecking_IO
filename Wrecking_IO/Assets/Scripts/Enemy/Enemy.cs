@@ -107,6 +107,15 @@ public class Enemy : MonoBehaviour
     public float sphereForce;
     public float MaxDamage;
 
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.CompareTag("power"))
+        {
+            Destroy(col.transform.parent.gameObject);
+            joint.Power();
+        }
+    }
     /// <summary>
     /// OnCollisionEnter is called when this collider/rigidbody has begun
     /// touching another rigidbody/collider.
@@ -114,11 +123,7 @@ public class Enemy : MonoBehaviour
     /// <param name="col">The Collision data associated with this collision.</param>
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.CompareTag("power"))
-        {
-            Destroy(col.transform.parent.gameObject);
-            joint.Power();
-        }
+    
 
 
         // return;

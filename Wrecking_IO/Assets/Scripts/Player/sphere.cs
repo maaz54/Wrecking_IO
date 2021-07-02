@@ -29,6 +29,7 @@ public class sphere : MonoBehaviour
         {
             col.gameObject.GetComponent<Enemy>().GetDamage();
         }
+       
         Vector3 dir = col.contacts[0].point - transform.position;
         dir.y = .1f;
         dir = dir.normalized;

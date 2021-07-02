@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     public static Player instance;
     public Joystick joystick;
     bool canPlay = false;
+    bool canMove = false;
     public float speed = 5;
     public float rotSpeed = 5;
     public bool dragBegins = false;
@@ -30,6 +31,7 @@ public class Player : MonoBehaviour
         {
             if (Input.GetMouseButton(0))
             {
+                if(canMove)
                 Movement();
             }
              Boundary();
@@ -94,7 +96,23 @@ public class Player : MonoBehaviour
         }
         transform.position = pos;
     }
+    public void GetDamage()
+    {
+        if (getDamageCoroutine != null)
+        {
+            StopCoroutine(getDamageCoroutine);
+        }
+        getDamageCoroutine = StartCoroutine(iGetDamage());
+    }
+    Coroutine getDamageCoroutine;
+    IEnumerator iGetDamage()
+    {
+        canMove=false;
+        yield return new WaitForSeconds(2);
+        rigidbody.velocity = Vector3.zero;
+      canMove=true;
 
+    }
 
     public void MouseDown()
     {
@@ -115,10 +133,12 @@ public class Player : MonoBehaviour
     void GameStart()
     {
         canPlay = true;
+        canMove=true;
     }
     void LevelFinsih(bool isComplete)
     {
         canPlay = false;
+        canMove=true;
         // if(isComplete)
         // rigidbody.isKinematic = true;
     }
