@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (canPlay)
         {
@@ -32,7 +32,9 @@ public class Enemy : MonoBehaviour
                     Vector3 dir = (target.position - transform.position);
                     dir.y = 0;
                     dir.Normalize();
-                    transform.Translate(dir * speed * Time.deltaTime, Space.World);
+                    // transform.Translate(dir * speed * Time.deltaTime, Space.World);
+
+                    rb.velocity = (dir * speed * Time.deltaTime);
                     if (dir != Vector3.zero)
                     {
                         Quaternion toRot = Quaternion.LookRotation(dir, Vector3.up);
@@ -43,37 +45,56 @@ public class Enemy : MonoBehaviour
             }
             if (line)
             {
+                try{
+
                 line.SetPosition(0, transform.position);
                 line.SetPosition(1, sphere.transform.position);
+                }
+                catch{};
             }
+         if (transform.position.y < -.5f)
+        {
+            canFollow = false;
+            Destroy(transform.parent.gameObject, 9);
+            GameManager.instance.EnemyDead();
+            canPlay = false;
+            line.positionCount = 0;
+        }
         }
     }
 
     void Boundary()
     {
         Vector3 pos = transform.position;
-        if (pos.x > 18)
-        {
-            pos.x = 18;
-        }
-        else if (pos.x < -18)
-        {
-            pos.x = -18;
-        }
+        // if (pos.x > 18)
+        // {
+        //     pos.x = 18;
+        // }
+        // else if (pos.x < -18)
+        // {
+        //     pos.x = -18;
+        // }
 
-        if (pos.z > 18)
-        {
-            pos.z = 18;
-        }
-        else if (pos.z < -18)
-        {
-            pos.z = -18;
-        }
+        // if (pos.z > 18)
+        // {
+        //     pos.z = 18;
+        // }
+        // else if (pos.z < -18)
+        // {
+        //     pos.z = -18;
+        // }
         if (pos.y > .5f)
         {
             pos.y = .5f;
         }
-
+        if (pos.y < -.5f)
+        {
+            canFollow = false;
+            Destroy(transform.parent.gameObject, 9);
+            GameManager.instance.EnemyDead();
+            canPlay = false;
+            line.positionCount = 0;
+        }
         transform.position = pos;
     }
 
@@ -92,34 +113,56 @@ public class Enemy : MonoBehaviour
     /// <param name="col">The Collision data associated with this collision.</param>
     void OnCollisionEnter(Collision col)
     {
+        // return;
         if (col.gameObject.CompareTag("sphere"))
         {
 
             if (canPlay)
             {
+                return;
+                if (getDamageCoroutine != null)
+                {
+                    StopCoroutine(getDamageCoroutine);
+                }
+                getDamageCoroutine = StartCoroutine(iGetDamage());
                 Vector3 sphereVel = col.transform.GetComponent<sphere>().sphereForce;
                 Vector3 dir = col.contacts[0].point - transform.position;
 
                 dir.y = .5f;
                 dir = -dir.normalized;
                 // rb.velocity = (dir *sphereVel.x* sphereForce);
-                if (sphereVel.x > MaxDamage || sphereVel.x < -MaxDamage)
-                {
-                    canFollow = false;
-                    Destroy(transform.parent.gameObject, 9);
-                    GameManager.instance.EnemyDead();
-                    canPlay = false;
-                    line.positionCount = 0;
+                // if (sphereVel.x > MaxDamage || sphereVel.x < -MaxDamage)
+                // {
+                //     canFollow = false;
+                //     Destroy(transform.parent.gameObject, 9);
+                //     GameManager.instance.EnemyDead();
+                //     canPlay = false;
+                //     line.positionCount = 0;
 
-                }
-                if(sphereVel.x <0)
+                // }
+                if (sphereVel.x < 0)
                 {
-                    sphereVel.x = sphereVel.x*-1;
+                    sphereVel.x = sphereVel.x * -1;
                 }
                 rb.velocity = (dir * sphereVel.x);
 
             }
         }
+    }
+    public void GetDamage()
+    {
+        if (getDamageCoroutine != null)
+        {
+            StopCoroutine(getDamageCoroutine);
+        }
+        getDamageCoroutine = StartCoroutine(iGetDamage());
+    }
+    Coroutine getDamageCoroutine;
+    IEnumerator iGetDamage()
+    {
+        canFollow = false;
+        yield return new WaitForSeconds(2);
+        canFollow = true;
     }
 
     void GameStart()

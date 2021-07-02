@@ -12,10 +12,10 @@ public class Player : MonoBehaviour
     public LineRenderer line;
     public GameObject sphere;
     public joint joint;
-     public Rigidbody rigidbody;
+    public Rigidbody rigidbody;
     private void Awake()
     {
-        
+
         instance = this;
     }
     void Start()
@@ -23,12 +23,16 @@ public class Player : MonoBehaviour
         GameManager.instance.levelFinish += LevelFinsih;
         GameManager.instance.gameStart += GameStart;
     }
-    void Update()
+    // void Update()
+    void FixedUpdate()
     {
         if (canPlay)
         {
-            Movement();
-
+            if (Input.GetMouseButton(0))
+            {
+                Movement();
+            }
+             Boundary();
             //transform.position = Vector3.Lerp(transform.position, targetPos, speed * Time.deltaTime);
         }
         if (line)
@@ -37,46 +41,56 @@ public class Player : MonoBehaviour
             line.SetPosition(1, sphere.transform.position);
         }
     }
-
+    float horizontal;
+    float vertital;
     void Movement()
     {
+        if (joystick.Horizontal != 0 || joystick.Vertical != 0)
+        {
+            horizontal = joystick.Horizontal;
+            vertital = joystick.Vertical;
+        }
 
-        float horizontal = joystick.Horizontal;
-        float vertital = joystick.Vertical;
+
         Vector3 moveDirection = new Vector3(horizontal, 0, vertital);
         moveDirection.Normalize();
-        transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+        // transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+        rigidbody.AddForce(moveDirection * speed * Time.deltaTime);
 
         if (moveDirection != Vector3.zero)
         {
             Quaternion toRot = Quaternion.LookRotation(moveDirection, Vector3.up);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRot, rotSpeed * Time.deltaTime);
         }
-        Boundary();
+       
     }
     void Boundary()
     {
         Vector3 pos = transform.position;
-        if (pos.x > 18)
-        {
-            pos.x = 18;
-        }
-        else if (pos.x < -18)
-        {
-            pos.x = -18;
-        }
+        // if (pos.x > 18)
+        // {
+        //     pos.x = 18;
+        // }
+        // else if (pos.x < -18)
+        // {
+        //     pos.x = -18;
+        // }
 
-        if (pos.z > 18)
-        {
-            pos.z = 18;
-        }
-        else if (pos.z < -18)
-        {
-            pos.z = -18;
-        }
+        // if (pos.z > 18)
+        // {
+        //     pos.z = 18;
+        // }
+        // else if (pos.z < -18)
+        // {
+        //     pos.z = -18;
+        // }
         if (pos.y > .5f)
         {
             pos.y = .5f;
+        }
+        if (pos.y < -3)
+        {
+            GameManager.instance.LevelFinsih(false);
         }
         transform.position = pos;
     }
@@ -105,13 +119,14 @@ public class Player : MonoBehaviour
     void LevelFinsih(bool isComplete)
     {
         canPlay = false;
-        rigidbody.isKinematic = true;
+        // if(isComplete)
+        // rigidbody.isKinematic = true;
     }
     private void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.CompareTag("power"))
         {
-            Destroy(col.gameObject);
+            Destroy(col.transform.parent.gameObject);
             joint.Power();
         }
     }

@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 public class UIManager : MonoBehaviour
 {
 
     #region texts
     public Text enemyCountText;
+    public Text AreaShrinkTimerText;
     public Text tutorialText;
+    public Text warningText;
+
     #endregion
 
     #region  Buttons
@@ -29,7 +33,7 @@ public class UIManager : MonoBehaviour
         {
             ChangePanel(gamePlayPanel);
             GameManager.instance.GameStart();
-            Invoke("CloseTutorial",3);
+            Invoke("CloseTutorial", 3);
         });
         restartButton.onClick.AddListener(() => { OnRestartButton(); });
         nextButton.onClick.AddListener(() => { OnNextButton(); });
@@ -40,10 +44,21 @@ public class UIManager : MonoBehaviour
         ChangePanel(menuPanel);
     }
 
-void CloseTutorial()
+public void AreaShrinkTimer(int time)
 {
-    tutorialText.gameObject.SetActive(false);
+AreaShrinkTimerText.text ="Area Start Shrinking in " + time;
 }
+    public void WarningText(string msg)
+    {
+        warningText.gameObject.SetActive(true);
+        warningText.text = msg;
+        StartCoroutine(WaitAndExecute(1, () => { warningText.gameObject.SetActive(false); }));
+    }
+
+    void CloseTutorial()
+    {
+        tutorialText.gameObject.SetActive(false);
+    }
 
     void ChangePanel(GameObject panel)
     {
@@ -80,5 +95,9 @@ void CloseTutorial()
     {
         Application.LoadLevel(Application.loadedLevel);
     }
-
+    IEnumerator WaitAndExecute(float wait, Action action)
+    {
+        yield return new WaitForSeconds(wait);
+        action();
+    }
 }

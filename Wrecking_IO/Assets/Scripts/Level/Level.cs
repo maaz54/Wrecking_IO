@@ -8,12 +8,22 @@ public class Level : MonoBehaviour
     public GameSetting gameSetting;
     public GameObject[] pickupsObjects;
     public GameObject[] enemies;
+    public Power powerDrop;
+    [System.Serializable]
+    public class IslandPhase
+    {
+        public bool isDown=false;
+        public List<GameObject> sideObjects;
+    }
+    public List<IslandPhase> islandPhases;
+public GameObject islandcollider;
+
 
     public void CreateLevel(int levelNo)
     {
         PlayerSetting(levelNo);
         CreateEnemies(levelNo);
-        CreatePickupsObjects(levelNo);
+        // CreatePickupsObjects(levelNo);
         GameManager.instance.totalEnemies = gameSetting.LevelSettings[levelNo-1].enemySetting.Count;
     }
     void PlayerSetting(int levelNo)
