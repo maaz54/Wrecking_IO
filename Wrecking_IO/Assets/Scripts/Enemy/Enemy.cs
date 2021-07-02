@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
     public LineRenderer line;
     public GameObject sphere;
     public Rigidbody rb;
-
+    public joint joint;
     void Start()
     {
         GameManager.instance.levelFinish += LevelFinsih;
@@ -45,21 +45,22 @@ public class Enemy : MonoBehaviour
             }
             if (line)
             {
-                try{
+                try
+                {
 
-                line.SetPosition(0, transform.position);
-                line.SetPosition(1, sphere.transform.position);
+                    line.SetPosition(0, transform.position);
+                    line.SetPosition(1, sphere.transform.position);
                 }
-                catch{};
+                catch { };
             }
-         if (transform.position.y < -.5f)
-        {
-            canFollow = false;
-            Destroy(transform.parent.gameObject, 9);
-            GameManager.instance.EnemyDead();
-            canPlay = false;
-            line.positionCount = 0;
-        }
+            if (transform.position.y < -.5f)
+            {
+                canFollow = false;
+                Destroy(transform.parent.gameObject, 9);
+                GameManager.instance.EnemyDead();
+                canPlay = false;
+                line.positionCount = 0;
+            }
         }
     }
 
@@ -113,6 +114,13 @@ public class Enemy : MonoBehaviour
     /// <param name="col">The Collision data associated with this collision.</param>
     void OnCollisionEnter(Collision col)
     {
+        if (col.gameObject.CompareTag("power"))
+        {
+            Destroy(col.transform.parent.gameObject);
+            joint.Power();
+        }
+
+
         // return;
         if (col.gameObject.CompareTag("sphere"))
         {
@@ -162,7 +170,7 @@ public class Enemy : MonoBehaviour
     {
         canFollow = false;
         yield return new WaitForSeconds(2);
-        rb.velocity=Vector3.zero;
+        rb.velocity = Vector3.zero;
         canFollow = true;
 
     }

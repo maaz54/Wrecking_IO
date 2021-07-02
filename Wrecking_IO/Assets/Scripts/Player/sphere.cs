@@ -48,7 +48,7 @@ public class sphere : MonoBehaviour
         }
         else
         {
-        col.gameObject.GetComponent<Rigidbody>().AddForce(dir * Force * sphereForce.x/2);
+        col.gameObject.GetComponent<Rigidbody>().AddForce((dir * Force )/2);
 
         }
 
