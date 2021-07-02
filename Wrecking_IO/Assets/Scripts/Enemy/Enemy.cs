@@ -162,7 +162,9 @@ public class Enemy : MonoBehaviour
     {
         canFollow = false;
         yield return new WaitForSeconds(2);
+        rb.velocity=Vector3.zero;
         canFollow = true;
+
     }
 
     void GameStart()
